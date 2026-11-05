@@ -6,8 +6,9 @@ CachyOS (KDE Plasma 6) paneli için yazdığım küçük gereçler (plasmoid).
 |---|---|
 | [Kulaklık Pili](#kulaklık-pili) | Kablosuz kulaklığın pil yüzdesini panelde gösterir |
 | [Ağ Trafiği](#ağ-trafiği) | Anlık indirme ve yükleme hızını panelde gösterir |
+| [Sistem Durumu](#sistem-durumu) | İşlemci, ekran kartı ve sıvı soğutma sıcaklıklarını panelde gösterir |
 
-![Panelde Ağ Trafiği (solda) ve Kulaklık Pili (sağda)](ekran-goruntuleri/panel.png)
+![Panelde soldan sağa Sistem Durumu, Ağ Trafiği ve Kulaklık Pili](ekran-goruntuleri/panel.png)
 
 ---
 
@@ -74,6 +75,46 @@ Veriyi Plasma'nın kendi sistem izleme servisinden (`ksystemstats`) alır; komut
 
 ---
 
+## Sistem Durumu
+
+`sistem-durumu/` — İşlemci, ekran kartı ve sıvı soğutma sıcaklıklarını gösterir.
+İşlemci ve ekran kartı değerlerini `ksystemstats`'tan, sıvı soğutma değerlerini [liquidctl](https://github.com/liquidctl/liquidctl) ile okur.
+AMD Ryzen, NVIDIA GeForce RTX 4070 Ti ve Corsair Commander ST ile denendi.
+
+![Sistem Durumu açılır penceresi](ekran-goruntuleri/sistem-durumu.png)
+
+**Özellikler**
+
+- Panelde üç blok: `CPU`, `GPU`, `SU` başlıkları altında büyük rakamlarla sıcaklık
+- Sıcaklık yükselince renk değişir:
+
+  | | Turuncu | Kırmızı |
+  |---|---|---|
+  | İşlemci | 85 °C | 95 °C |
+  | Ekran kartı | 80 °C | 87 °C |
+  | Su | 45 °C | 50 °C |
+
+- Tıklayınca: işlemci kullanımı; ekran kartının adı, kullanımı, güç tüketimi ve video belleği; pompa ve fan devirleri
+- Sıvı soğutma cihazı bulunamazsa `SU` bloğu kendiliğinden gizlenir
+
+**Ayarlar** (sağ tık → Yapılandır)
+
+| Ayar | Varsayılan |
+|---|---|
+| Panelde gösterilecekler | İşlemci, ekran kartı, sıvı soğutma |
+| Sıvı soğutma okuma aralığı | 5 sn |
+
+**Gereksinim:** Sıvı soğutma için `liquidctl` paketi (isteğe bağlı). İşlemci ve ekran kartı için ek paket gerekmez.
+
+```sh
+sudo pacman -S liquidctl
+liquidctl status
+```
+
+Ekran kartı olarak sistemdeki ilk GPU (`gpu0`) kullanılır.
+
+---
+
 ## Kurulum
 
 ```sh
@@ -82,9 +123,10 @@ cd cachyos-my-plugins
 
 kpackagetool6 -t Plasma/Applet -i kulaklik-pili
 kpackagetool6 -t Plasma/Applet -i ag-trafigi
+kpackagetool6 -t Plasma/Applet -i sistem-durumu
 ```
 
-Ardından panele sağ tık → **Gereç Ekle…** → "Kulaklık Pili" ya da "Ağ Trafiği" aratıp panele sürükleyin.
+Ardından panele sağ tık → **Gereç Ekle…** → "Kulaklık Pili", "Ağ Trafiği" ya da "Sistem Durumu" aratıp panele sürükleyin.
 
 ## Güncelleme
 
@@ -93,6 +135,7 @@ Kodda değişiklik yaptıktan sonra:
 ```sh
 kpackagetool6 -t Plasma/Applet -u kulaklik-pili
 kpackagetool6 -t Plasma/Applet -u ag-trafigi
+kpackagetool6 -t Plasma/Applet -u sistem-durumu
 ```
 
 Panelde zaten duran bir gerecin yeni halini görmek için Plasma'yı yeniden başlatın:
@@ -106,6 +149,7 @@ systemctl --user restart plasma-plasmashell.service
 ```sh
 kpackagetool6 -t Plasma/Applet -r net.hakanakkaya.kulaklikpili
 kpackagetool6 -t Plasma/Applet -r net.hakanakkaya.agtrafigi
+kpackagetool6 -t Plasma/Applet -r net.hakanakkaya.sistemdurumu
 ```
 
 ## Hızlı deneme
@@ -115,12 +159,13 @@ Panele eklemeden ayrı bir pencerede açmak için:
 ```sh
 plasmawindowed net.hakanakkaya.kulaklikpili
 plasmawindowed net.hakanakkaya.agtrafigi
+plasmawindowed net.hakanakkaya.sistemdurumu
 ```
 
 QML hataları journal'a düşer:
 
 ```sh
-journalctl --user -f | grep -i -E 'kulaklikpili|agtrafigi'
+journalctl --user -f | grep -i -E 'kulaklikpili|agtrafigi|sistemdurumu'
 ```
 
 ## Klasör yapısı

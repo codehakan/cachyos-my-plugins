@@ -1,0 +1,18 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "Hakan AKKAYA"
+            }
+        ],
+        "Category": "System Information",
+        "Description": "İşlemci, ekran kartı ve sıvı soğutma sıcaklıklarını gösterir",
+        "Icon": "temperature-normal",
+        "Id": "net.hakanakkaya.sistemdurumu",
+        "License": "GPL-3.0",
+        "Name": "Sistem Durumu",
+        "Version": "1.0"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0"
+}

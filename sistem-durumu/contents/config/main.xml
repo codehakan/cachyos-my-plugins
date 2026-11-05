@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0
+      http://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
+  <kcfgfile name=""/>
+  <group name="General">
+    <entry name="showCpu" type="Bool">
+      <label>Panelde işlemci sıcaklığını göster</label>
+      <default>true</default>
+    </entry>
+    <entry name="showGpu" type="Bool">
+      <label>Panelde ekran kartı sıcaklığını göster</label>
+      <default>true</default>
+    </entry>
+    <entry name="showLiquid" type="Bool">
+      <label>Panelde sıvı soğutma sıcaklığını göster</label>
+      <default>true</default>
+    </entry>
+    <entry name="liquidInterval" type="Int">
+      <label>Sıvı soğutmanın kaç saniyede bir okunacağı</label>
+      <default>5</default>
+    </entry>
+  </group>
+</kcfg>
