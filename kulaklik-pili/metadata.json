@@ -3,13 +3,13 @@
     "KPlugin": {
         "Authors": [
             {
-                "Name": "hakanbey"
+                "Name": "Hakan AKKAYA"
             }
         ],
         "Category": "System Information",
         "Description": "Kablosuz kulaklığın pil yüzdesini gösterir (HeadsetControl ile)",
         "Icon": "audio-headset",
-        "Id": "com.hakanbey.kulaklikpili",
+        "Id": "net.hakanakkaya.kulaklikpili",
         "License": "GPL-3.0",
         "Name": "Kulaklık Pili",
         "Version": "1.0"

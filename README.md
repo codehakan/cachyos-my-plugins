@@ -7,12 +7,16 @@ CachyOS (KDE Plasma 6) paneli için yazdığım küçük gereçler (plasmoid).
 | [Kulaklık Pili](#kulaklık-pili) | Kablosuz kulaklığın pil yüzdesini panelde gösterir |
 | [Ağ Trafiği](#ağ-trafiği) | Anlık indirme ve yükleme hızını panelde gösterir |
 
+![Panelde Ağ Trafiği (solda) ve Kulaklık Pili (sağda)](ekran-goruntuleri/panel.png)
+
 ---
 
 ## Kulaklık Pili
 
 `kulaklik-pili/` — Kablosuz kulaklığın pilini [HeadsetControl](https://github.com/Sapd/HeadsetControl) ile okur.
 SteelSeries Arctis Nova 3X Wireless ile denendi; HeadsetControl'ün pil okumayı desteklediği diğer kulaklıklarla da çalışması gerekir.
+
+![Kulaklık Pili açılır penceresi](ekran-goruntuleri/kulaklik-pili.png)
 
 **Özellikler**
 
@@ -49,6 +53,8 @@ headsetcontrol -b
 
 `ag-trafigi/` — Tüm ağ arayüzlerinin toplam indirme/yükleme hızını gösterir.
 Veriyi Plasma'nın kendi sistem izleme servisinden (`ksystemstats`) alır; komut çalıştırmaz, ek yük getirmez.
+
+![Ağ Trafiği açılır penceresi](ekran-goruntuleri/ag-trafigi.png)
 
 **Özellikler**
 
@@ -98,8 +104,8 @@ systemctl --user restart plasma-plasmashell.service
 ## Kaldırma
 
 ```sh
-kpackagetool6 -t Plasma/Applet -r com.hakanbey.kulaklikpili
-kpackagetool6 -t Plasma/Applet -r com.hakanbey.agtrafigi
+kpackagetool6 -t Plasma/Applet -r net.hakanakkaya.kulaklikpili
+kpackagetool6 -t Plasma/Applet -r net.hakanakkaya.agtrafigi
 ```
 
 ## Hızlı deneme
@@ -107,8 +113,8 @@ kpackagetool6 -t Plasma/Applet -r com.hakanbey.agtrafigi
 Panele eklemeden ayrı bir pencerede açmak için:
 
 ```sh
-plasmawindowed com.hakanbey.kulaklikpili
-plasmawindowed com.hakanbey.agtrafigi
+plasmawindowed net.hakanakkaya.kulaklikpili
+plasmawindowed net.hakanakkaya.agtrafigi
 ```
 
 QML hataları journal'a düşer:

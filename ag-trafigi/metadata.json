@@ -3,13 +3,13 @@
     "KPlugin": {
         "Authors": [
             {
-                "Name": "hakanbey"
+                "Name": "Hakan AKKAYA"
             }
         ],
         "Category": "System Information",
         "Description": "Anlık indirme ve yükleme hızını gösterir",
         "Icon": "network-transmit-receive",
-        "Id": "com.hakanbey.agtrafigi",
+        "Id": "net.hakanakkaya.agtrafigi",
         "License": "GPL-3.0",
         "Name": "Ağ Trafiği",
         "Version": "1.0"
