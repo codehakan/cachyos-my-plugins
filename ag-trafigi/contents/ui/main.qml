@@ -16,11 +16,17 @@ PlasmoidItem {
     readonly property var down: formatRate(downRate)
     readonly property var up: formatRate(upRate)
 
-    readonly property color downColor: Kirigami.Theme.highlightColor
-    readonly property color upColor: Kirigami.Theme.neutralTextColor
+    // Seri renkleri; durum renkleri (turuncu/kırmızı) uyarıya ayrıldığı için kullanılmaz
+    readonly property color downColor: Kirigami.Theme.linkColor
+    readonly property color upColor: Kirigami.Theme.visitedLinkColor
 
     // Bu hızın altı "boşta" sayılır ve soluk gösterilir
     readonly property real idleRate: 1024
+
+    // Açılır penceredeki grafikler için son 60 saniye
+    readonly property int historySize: 60
+    property var downHistory: []
+    property var upHistory: []
 
     Plasmoid.icon: "network-transmit-receive"
     toolTipMainText: i18n("Ağ Trafiği")
@@ -44,6 +50,11 @@ PlasmoidItem {
         };
     }
 
+    function rateText(bytesPerSec) {
+        const r = formatRate(bytesPerSec);
+        return r.number + " " + r.unit;
+    }
+
     function formatSize(bytes) {
         const units = ["B", "KB", "MB", "GB", "TB"];
         let value = Math.max(0, Number(bytes) || 0);
@@ -53,6 +64,19 @@ PlasmoidItem {
             i++;
         }
         return Number(value).toLocaleString(Qt.locale(), "f", i > 0 ? 1 : 0) + " " + units[i];
+    }
+
+    // 1 KB/sn → ~0, 10 MB/sn ve üstü → 1 (logaritmik)
+    function activity(bytesPerSec) {
+        if (bytesPerSec < idleRate) {
+            return 0;
+        }
+        return Math.max(0.05, Math.min(1, Math.log10(bytesPerSec / 1024) / 4));
+    }
+
+    function pushHistory(list, value) {
+        const next = list.concat([value]);
+        return next.length > historySize ? next.slice(next.length - historySize) : next;
     }
 
     Sensors.Sensor {
@@ -77,6 +101,16 @@ PlasmoidItem {
         id: totalUpSensor
         sensorId: "network/all/totalUpload"
         enabled: root.expanded
+    }
+
+    Timer {
+        interval: 1000
+        running: true
+        repeat: true
+        onTriggered: {
+            root.downHistory = root.pushHistory(root.downHistory, root.downRate);
+            root.upHistory = root.pushHistory(root.upHistory, root.upRate);
+        }
     }
 
     compactRepresentation: MouseArea {
@@ -114,12 +148,12 @@ PlasmoidItem {
             columnSpacing: Math.round(Kirigami.Units.smallSpacing / 2)
 
             // İndirme satırı
-            PlasmaComponents3.Label {
-                Layout.alignment: Qt.AlignBaseline
-                text: "↓"
+            FlowArrow {
+                Layout.alignment: Qt.AlignVCenter
+                glyph: "↓"
                 color: root.downColor
-                font.pixelSize: compact.fontSize
-                font.bold: true
+                pixelSize: compact.fontSize
+                activity: root.activity(root.downRate)
             }
             PlasmaComponents3.Label {
                 Layout.alignment: Qt.AlignBaseline
@@ -138,12 +172,12 @@ PlasmoidItem {
             }
 
             // Yükleme satırı
-            PlasmaComponents3.Label {
-                Layout.alignment: Qt.AlignBaseline
-                text: "↑"
+            FlowArrow {
+                Layout.alignment: Qt.AlignVCenter
+                glyph: "↑"
                 color: root.upColor
-                font.pixelSize: compact.fontSize
-                font.bold: true
+                pixelSize: compact.fontSize
+                activity: root.activity(root.upRate)
             }
             PlasmaComponents3.Label {
                 Layout.alignment: Qt.AlignBaseline
@@ -163,75 +197,198 @@ PlasmoidItem {
         }
     }
 
+    // Açılır penceredeki hız kartı: büyük değer, en yüksek hız ve 60 sn grafiği
+    component RateCard: Card {
+        id: rateCard
+
+        property string title
+        property string glyph
+        property color seriesColor
+        property real rate
+        property var history: []
+        property var formatRate
+        property var rateText
+
+        readonly property real peak: history.length ? Math.max(...history) : 0
+        property real displayRate: rate
+        readonly property var display: formatRate(displayRate)
+
+        Behavior on displayRate { NumberAnimation { duration: 600; easing.type: Easing.OutCubic } }
+
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: Kirigami.Units.smallSpacing
+
+            Rectangle {
+                Layout.preferredWidth: Kirigami.Units.iconSizes.smallMedium
+                Layout.preferredHeight: Kirigami.Units.iconSizes.smallMedium
+                radius: width / 2
+                color: Qt.rgba(rateCard.seriesColor.r, rateCard.seriesColor.g, rateCard.seriesColor.b, 0.18)
+
+                PlasmaComponents3.Label {
+                    anchors.centerIn: parent
+                    text: rateCard.glyph
+                    color: rateCard.seriesColor
+                    font.bold: true
+                }
+            }
+            Kirigami.Heading {
+                level: 4
+                text: rateCard.title
+            }
+            Item { Layout.fillWidth: true }
+            PlasmaComponents3.Label {
+                text: i18n("en yüksek %1", rateCard.rateText(rateCard.peak))
+                font: Kirigami.Theme.smallFont
+                opacity: 0.6
+            }
+        }
+
+        RowLayout {
+            spacing: Kirigami.Units.smallSpacing
+
+            PlasmaComponents3.Label {
+                Layout.alignment: Qt.AlignBaseline
+                text: rateCard.display.number
+                font.pixelSize: Math.round(Kirigami.Theme.defaultFont.pixelSize * 2.4)
+                font.weight: Font.DemiBold
+            }
+            PlasmaComponents3.Label {
+                Layout.alignment: Qt.AlignBaseline
+                text: rateCard.display.unit
+                opacity: 0.7
+            }
+        }
+
+        Sparkline {
+            Layout.fillWidth: true
+            values: rateCard.history
+            capacity: 60
+            color: rateCard.seriesColor
+            formatValue: rateCard.rateText
+        }
+    }
+
     fullRepresentation: PlasmaExtras.Representation {
-        Layout.minimumWidth: Kirigami.Units.gridUnit * 14
-        Layout.minimumHeight: Kirigami.Units.gridUnit * 8
-        Layout.preferredWidth: Kirigami.Units.gridUnit * 16
-        Layout.preferredHeight: Kirigami.Units.gridUnit * 9
+        id: popup
+
+        // Panel dışında (ör. plasmawindowed) expanded hep false kalabilir
+        readonly property bool open: root.expanded || Plasmoid.formFactor === PlasmaCore.Types.Planar
+        readonly property real totalDown: Number(totalDownSensor.value) || 0
+        readonly property real totalUp: Number(totalUpSensor.value) || 0
+        readonly property real downShare: totalDown + totalUp > 0 ? totalDown / (totalDown + totalUp) : 0.5
+
+        Layout.minimumWidth: Kirigami.Units.gridUnit * 20
+        Layout.preferredWidth: Kirigami.Units.gridUnit * 22
+        Layout.minimumHeight: cards.implicitHeight + Kirigami.Units.largeSpacing * 2
+        Layout.preferredHeight: cards.implicitHeight + Kirigami.Units.largeSpacing * 2
 
         contentItem: Item {
-            GridLayout {
-                anchors.fill: parent
+            ColumnLayout {
+                id: cards
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: parent.top
                 anchors.margins: Kirigami.Units.largeSpacing
-                columns: 2
-                columnSpacing: Kirigami.Units.largeSpacing
-                rowSpacing: Kirigami.Units.smallSpacing
+                spacing: Kirigami.Units.largeSpacing
 
-                PlasmaComponents3.Label {
-                    text: i18n("İndirme")
-                    opacity: 0.7
-                }
-                Kirigami.Heading {
+                RateCard {
                     Layout.fillWidth: true
-                    level: 2
-                    text: "↓ " + root.down.number + " " + root.down.unit
-                    color: root.downColor
+                    shown: popup.open
+                    delay: 0
+                    title: i18n("İndirme")
+                    glyph: "↓"
+                    seriesColor: root.downColor
+                    rate: root.downRate
+                    history: root.downHistory
+                    formatRate: root.formatRate
+                    rateText: root.rateText
                 }
 
-                PlasmaComponents3.Label {
-                    text: i18n("Yükleme")
-                    opacity: 0.7
-                }
-                Kirigami.Heading {
+                RateCard {
                     Layout.fillWidth: true
-                    level: 2
-                    text: "↑ " + root.up.number + " " + root.up.unit
-                    color: root.upColor
+                    shown: popup.open
+                    delay: 90
+                    title: i18n("Yükleme")
+                    glyph: "↑"
+                    seriesColor: root.upColor
+                    rate: root.upRate
+                    history: root.upHistory
+                    formatRate: root.formatRate
+                    rateText: root.rateText
                 }
 
-                Kirigami.Separator {
-                    Layout.columnSpan: 2
+                // Açılıştan beri toplamlar ve indirme/yükleme oranı
+                Card {
                     Layout.fillWidth: true
-                    Layout.topMargin: Kirigami.Units.smallSpacing
-                    Layout.bottomMargin: Kirigami.Units.smallSpacing
-                }
+                    shown: popup.open
+                    delay: 180
 
-                PlasmaComponents3.Label {
-                    Layout.columnSpan: 2
-                    text: i18n("Açılıştan beri toplam")
-                    font: Kirigami.Theme.smallFont
-                    opacity: 0.6
-                }
+                    PlasmaComponents3.Label {
+                        text: i18n("Açılıştan beri toplam")
+                        font: Kirigami.Theme.smallFont
+                        opacity: 0.6
+                    }
 
-                PlasmaComponents3.Label {
-                    text: i18n("İndirilen")
-                    opacity: 0.7
-                }
-                PlasmaComponents3.Label {
-                    text: root.formatSize(totalDownSensor.value)
-                }
+                    RowLayout {
+                        Layout.fillWidth: true
 
-                PlasmaComponents3.Label {
-                    text: i18n("Yüklenen")
-                    opacity: 0.7
-                }
-                PlasmaComponents3.Label {
-                    text: root.formatSize(totalUpSensor.value)
-                }
+                        Rectangle {
+                            Layout.preferredWidth: 8
+                            Layout.preferredHeight: 8
+                            radius: 4
+                            color: root.downColor
+                        }
+                        PlasmaComponents3.Label {
+                            text: i18n("İndirilen")
+                            opacity: 0.7
+                        }
+                        PlasmaComponents3.Label {
+                            text: root.formatSize(popup.totalDown)
+                        }
+                        Item { Layout.fillWidth: true }
+                        Rectangle {
+                            Layout.preferredWidth: 8
+                            Layout.preferredHeight: 8
+                            radius: 4
+                            color: root.upColor
+                        }
+                        PlasmaComponents3.Label {
+                            text: i18n("Yüklenen")
+                            opacity: 0.7
+                        }
+                        PlasmaComponents3.Label {
+                            text: root.formatSize(popup.totalUp)
+                        }
+                    }
 
-                Item {
-                    Layout.columnSpan: 2
-                    Layout.fillHeight: true
+                    // İki parçalı oran çubuğu; parçalar arasında 2 px boşluk
+                    Item {
+                        id: ratio
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 6
+
+                        readonly property real gap: 2
+                        readonly property real usable: width - gap
+
+                        Rectangle {
+                            height: parent.height
+                            radius: height / 2
+                            width: Math.max(height, ratio.usable * popup.downShare)
+                            color: root.downColor
+
+                            Behavior on width { NumberAnimation { duration: 700; easing.type: Easing.OutCubic } }
+                        }
+                        Rectangle {
+                            anchors.right: parent.right
+                            height: parent.height
+                            radius: height / 2
+                            width: Math.max(height, ratio.usable * (1 - popup.downShare))
+                            color: root.upColor
+
+                            Behavior on width { NumberAnimation { duration: 700; easing.type: Easing.OutCubic } }
+                        }
+                    }
                 }
             }
         }
