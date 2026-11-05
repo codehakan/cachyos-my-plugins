@@ -369,7 +369,7 @@ PlasmoidItem {
                                 Kirigami.Icon {
                                     Layout.preferredWidth: Kirigami.Units.iconSizes.small
                                     Layout.preferredHeight: Kirigami.Units.iconSizes.small
-                                    source: Qt.resolvedUrl("../images/cpu.svg")
+                                    source: Qt.resolvedUrl("../images/chip.svg")
                                     isMask: true
                                     color: root.gaugeColor(root.cpuTemp, root.cpuLimits)
                                 }

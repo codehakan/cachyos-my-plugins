@@ -59,10 +59,18 @@ Veriyi Plasma'nın kendi sistem izleme servisinden (`ksystemstats`) alır; komut
 
 **Özellikler**
 
-- Panelde iki satır: mavi `↓` indirme, mor `↑` yükleme
+**Panelde**
+
+- İki satır: mavi `↓` indirme, mor `↑` yükleme (renkler temadan okunur)
 - Sabit genişlik: sayılar en fazla 3 karakter (`999`, `12`, `9,9`), panel titremez
-- Bağlantı boştayken (< 1 KB/sn) sayılar soluklaşır
-- Tıklayınca: sayarak değişen anlık hız, en yüksek hız ve son 60 saniyenin canlı grafiği (üzerine gelince değer); açılıştan beri toplamlar ve indirme/yükleme oran çubuğu
+- Bağlantı boştayken (< 1 KB/sn) ok ve sayılar soluklaşır; panelde hareket eden bir şey yoktur
+
+**Tıklayınca**
+
+- İndirme ve Yükleme kartları: sayarak değişen anlık hız, son 60 saniyenin en yüksek hızı
+- Her kartta son 60 saniyenin canlı grafiği; üzerine gelince o anın değeri (`13 sn önce · 1,3 KB/sn`)
+- Açılıştan beri toplam indirilen/yüklenen miktar ve ikisinin oranını gösteren çubuk
+- Kartlar pencere açılınca sırayla kayarak belirir
 
 **Ayarlar** (sağ tık → Yapılandır)
 
@@ -79,23 +87,32 @@ Veriyi Plasma'nın kendi sistem izleme servisinden (`ksystemstats`) alır; komut
 
 `sistem-durumu/` — İşlemci, ekran kartı ve sıvı soğutma sıcaklıklarını gösterir.
 İşlemci ve ekran kartı değerlerini `ksystemstats`'tan, sıvı soğutma değerlerini [liquidctl](https://github.com/liquidctl/liquidctl) ile okur.
-AMD Ryzen, NVIDIA GeForce RTX 4070 Ti ve Corsair Commander ST ile denendi.
+AMD Ryzen 9 9950X3D, NVIDIA GeForce RTX 4070 Ti ve Corsair Commander ST ile denendi.
 
 ![Sistem Durumu açılır penceresi](ekran-goruntuleri/sistem-durumu.png)
 
-**Özellikler**
+**Panelde**
 
-- Panelde üç blok: `CPU`, `GPU`, `SU` başlıkları altında büyük rakamlarla sıcaklık
-- Sıcaklık yükselince renk değişir:
+- Üç blok: `CPU`, `GPU`, `SU` başlıkları altında büyük rakamlarla sıcaklık
+- Her sıcaklığın altında, ısındıkça dolan ince bir çubuk
+- Sıcaklık yükselince renk yumuşakça değişir; kritik eşikte rakam yanıp söner:
 
-  | | Turuncu | Kırmızı |
+  | | Turuncu | Kırmızı (kritik) |
   |---|---|---|
   | İşlemci | 85 °C | 95 °C |
   | Ekran kartı | 80 °C | 87 °C |
   | Su | 45 °C | 50 °C |
 
-- Tıklayınca: işlemci kullanımı; ekran kartının adı, kullanımı, güç tüketimi ve video belleği; pompa ve fan devirleri
 - Sıvı soğutma okuması varsayılan olarak kapalıdır; açıldığında ve cihaz bulunursa `SU` bloğu görünür
+
+**Tıklayınca**
+
+- İşlemci ve ekran kartı kartları: parlayan halka gösterge, ortasında sayarak değişen sıcaklık;
+  kritik eşikte parıltı nabız gibi atar
+- İşlemcinin model adı, kullanım çubuğu; ekran kartının adı, güç tüketimi, kullanım ve video belleği çubukları
+- Her kartta son 60 saniyenin sıcaklık grafiği ve en yüksek değer; üzerine gelince o anın değeri
+- Sıvı soğutma okuması açıksa: su sıcaklığı göstergesi, pompa ve fanlar gerçek devirleriyle orantılı hızda döner
+- Kartlar pencere açılınca sırayla kayarak belirir
 
 **Ayarlar** (sağ tık → Yapılandır)
 
@@ -184,7 +201,8 @@ journalctl --user -f | grep -i -E 'kulaklikpili|agtrafigi|sistemdurumu'
     ├── images/                # (varsa) gerece özel görseller
     └── ui/
         ├── main.qml           # Panel görünümü ve açılır pencere
-        └── configGeneral.qml  # Ayarlar sayfası
+        ├── configGeneral.qml  # Ayarlar sayfası
+        └── *.qml              # (varsa) gerece özel bileşenler: kart, grafik, gösterge…
 ```
 
 ## Lisans
