@@ -14,8 +14,8 @@
       <default>true</default>
     </entry>
     <entry name="showLiquid" type="Bool">
-      <label>Panelde sıvı soğutma sıcaklığını göster</label>
-      <default>true</default>
+      <label>Sıvı soğutmayı liquidctl ile oku</label>
+      <default>false</default>
     </entry>
     <entry name="liquidInterval" type="Int">
       <label>Sıvı soğutmanın kaç saniyede bir okunacağı</label>

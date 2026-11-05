@@ -95,16 +95,20 @@ AMD Ryzen, NVIDIA GeForce RTX 4070 Ti ve Corsair Commander ST ile denendi.
   | Su | 45 °C | 50 °C |
 
 - Tıklayınca: işlemci kullanımı; ekran kartının adı, kullanımı, güç tüketimi ve video belleği; pompa ve fan devirleri
-- Sıvı soğutma cihazı bulunamazsa `SU` bloğu kendiliğinden gizlenir
+- Sıvı soğutma okuması varsayılan olarak kapalıdır; açıldığında ve cihaz bulunursa `SU` bloğu görünür
 
 **Ayarlar** (sağ tık → Yapılandır)
 
 | Ayar | Varsayılan |
 |---|---|
-| Panelde gösterilecekler | İşlemci, ekran kartı, sıvı soğutma |
+| Panelde gösterilecekler | İşlemci, ekran kartı (sıvı soğutma kapalı) |
 | Sıvı soğutma okuma aralığı | 5 sn |
 
 **Gereksinim:** Sıvı soğutma için `liquidctl` paketi (isteğe bağlı). İşlemci ve ekran kartı için ek paket gerekmez.
+
+> **Uyarı:** Corsair Commander Core/ST cihazları, `liquidctl` her okuma yaptığında yazılım moduna geçip
+> donanım moduna geri döner ve bu sırada ışıklarını yeniden başlatır. Okuma açıkken ışıklar okuma
+> aralığında bir sönüp yanar. Bu yüzden sıvı soğutma okuması varsayılan olarak kapalıdır.
 
 ```sh
 sudo pacman -S liquidctl

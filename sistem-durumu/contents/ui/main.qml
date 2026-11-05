@@ -139,13 +139,22 @@ PlasmoidItem {
         connectedSources: []
         onNewData: (sourceName, data) => {
             disconnectSource(sourceName);
-            root.parseLiquid(data["stdout"]);
+            if (Plasmoid.configuration.showLiquid) {
+                root.parseLiquid(data["stdout"]);
+            }
         }
     }
 
+    // Commander cihazları her okumada ışıklarını yeniden başlatır, bu yüzden
+    // okuma yalnızca kullanıcı açıkça izin verdiğinde yapılır
     Timer {
         interval: Math.max(2, Plasmoid.configuration.liquidInterval) * 1000
-        running: Plasmoid.configuration.showLiquid || root.expanded
+        running: Plasmoid.configuration.showLiquid
+        onRunningChanged: {
+            if (!running) {
+                root.liquidAvailable = false;
+            }
+        }
         repeat: true
         triggeredOnStart: true
         onTriggered: executable.connectSource(root.liquidCommand)
