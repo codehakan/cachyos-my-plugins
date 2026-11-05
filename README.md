@@ -59,7 +59,7 @@ Veriyi Plasma'nın kendi sistem izleme servisinden (`ksystemstats`) alır; komut
 
 **Özellikler**
 
-- Panelde iki satır: mavi `↓` indirme, mor `↑` yükleme; trafik varken oklar akar, hız arttıkça akış hızlanır
+- Panelde iki satır: mavi `↓` indirme, mor `↑` yükleme
 - Sabit genişlik: sayılar en fazla 3 karakter (`999`, `12`, `9,9`), panel titremez
 - Bağlantı boştayken (< 1 KB/sn) sayılar soluklaşır
 - Tıklayınca: sayarak değişen anlık hız, en yüksek hız ve son 60 saniyenin canlı grafiği (üzerine gelince değer); açılıştan beri toplamlar ve indirme/yükleme oran çubuğu

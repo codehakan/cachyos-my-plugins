@@ -66,14 +66,6 @@ PlasmoidItem {
         return Number(value).toLocaleString(Qt.locale(), "f", i > 0 ? 1 : 0) + " " + units[i];
     }
 
-    // 1 KB/sn → ~0, 10 MB/sn ve üstü → 1 (logaritmik)
-    function activity(bytesPerSec) {
-        if (bytesPerSec < idleRate) {
-            return 0;
-        }
-        return Math.max(0.05, Math.min(1, Math.log10(bytesPerSec / 1024) / 4));
-    }
-
     function pushHistory(list, value) {
         const next = list.concat([value]);
         return next.length > historySize ? next.slice(next.length - historySize) : next;
@@ -148,12 +140,13 @@ PlasmoidItem {
             columnSpacing: Math.round(Kirigami.Units.smallSpacing / 2)
 
             // İndirme satırı
-            FlowArrow {
-                Layout.alignment: Qt.AlignVCenter
-                glyph: "↓"
+            PlasmaComponents3.Label {
+                Layout.alignment: Qt.AlignBaseline
+                text: "↓"
                 color: root.downColor
-                pixelSize: compact.fontSize
-                activity: root.activity(root.downRate)
+                opacity: root.downRate < root.idleRate ? 0.45 : 1
+                font.pixelSize: compact.fontSize
+                font.bold: true
             }
             PlasmaComponents3.Label {
                 Layout.alignment: Qt.AlignBaseline
@@ -172,12 +165,13 @@ PlasmoidItem {
             }
 
             // Yükleme satırı
-            FlowArrow {
-                Layout.alignment: Qt.AlignVCenter
-                glyph: "↑"
+            PlasmaComponents3.Label {
+                Layout.alignment: Qt.AlignBaseline
+                text: "↑"
                 color: root.upColor
-                pixelSize: compact.fontSize
-                activity: root.activity(root.upRate)
+                opacity: root.upRate < root.idleRate ? 0.45 : 1
+                font.pixelSize: compact.fontSize
+                font.bold: true
             }
             PlasmaComponents3.Label {
                 Layout.alignment: Qt.AlignBaseline
