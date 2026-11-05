@@ -1,0 +1,18 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "hakanbey"
+            }
+        ],
+        "Category": "System Information",
+        "Description": "Anlık indirme ve yükleme hızını gösterir",
+        "Icon": "network-transmit-receive",
+        "Id": "com.hakanbey.agtrafigi",
+        "License": "GPL-3.0",
+        "Name": "Ağ Trafiği",
+        "Version": "1.0"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0"
+}
